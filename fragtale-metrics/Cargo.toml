@@ -1,0 +1,34 @@
+[package]
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+publish = { workspace = true }
+name = "fragtale_metrics"
+description = "Fragtale metrics"
+
+[dependencies]
+
+#tyst = { workspace = true, features = [] }
+
+# Logging and tracing
+log = { workspace = true, features = [] }
+
+# Async and concurrency
+#async-trait = { workspace = true, features = [] }
+crossbeam-skiplist = { workspace = true, features = [] }
+futures = { version = "0.3", default-features = false, features = ["std", "async-await"] }
+once_cell = { version = "1.19", default-features = false, features = []  }
+futures-util = { version = "0.3", default-features = false, features = ["std", "async-await"] }
+
+# REST API
+actix-web = { workspace = true, features = [] }
+utoipa = { workspace = true, features = [] }
+#serde = { workspace = true, features = [] }
+#serde_json = { workspace = true, features = [] }
+#serde_with = { workspace = true, features = [] }
+
+# Memory efficiency
+#arrayvec = "0.7"
+
+#prometheus-client = { version = "0.23", default-features = false, features = [] }

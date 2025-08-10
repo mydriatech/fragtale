@@ -1,0 +1,32 @@
+[package]
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+publish = { workspace = true }
+name = "fragtale"
+description = "Fragtale"
+
+[features]
+default = ["tracing"]
+tracing = [
+    "dep:tracing-subscriber",
+    "dep:tracing-appender",
+    "dep:tracing",
+]
+
+[dependencies]
+fragtale_api = { path = "../fragtale-api" }
+fragtale_core = { path = "../fragtale-core" }
+
+# Async and concurrency
+tokio = { workspace = true, features = [] }
+
+# Logging and tracing
+log = { workspace = true, features = [] }
+env_logger = { workspace = true, features = [] }
+
+# Optional: Tracing
+tracing-subscriber = { version = "0.3", default-features = false, features = ["std", "env-filter"], optional = true }
+tracing-appender = { version = "0.2", optional = true }
+tracing = { version = "0.1", optional = true }

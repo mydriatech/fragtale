@@ -1,0 +1,10 @@
+
+Wait for k8ssandra-operator to report the Cassandra cluster as "Ready":
+
+    watch kubectl get -n {{ .Release.Namespace }} k8cs/fragtale-k8cs -o=jsonpath='{.status.datacenters.dc1.cassandra.cassandraOperatorProgress}'
+
+Open up a cqlsh-shell as superuser to the cluster:
+
+    CASS_USERNAME=$(kubectl -n {{ .Release.Namespace }} get secret {{ include "fragtale-k8cs.fullname" . }}-superuser -o=jsonpath='{.data.username}' | base64 -d)
+    CASS_PASSWORD=$(kubectl -n {{ .Release.Namespace }} get secret {{ include "fragtale-k8cs.fullname" . }}-superuser -o=jsonpath='{.data.password}' | base64 -d)
+    kubectl exec -it {{ include "fragtale-k8cs.fullname" . }}-dc1-default-sts-0 -n {{ .Release.Namespace }} -c cassandra -- cqlsh -u $CASS_USERNAME -p $CASS_PASSWORD

@@ -1,0 +1,10 @@
+apiVersion: v2
+name: fragtale
+description: Cassandra Event Sourcing Overlay
+type: application
+version: 0.0.0
+appVersion: "0.0.0"
+#dependencies:
+#- name: pitsa
+#  version: "0.2.0"
+#  repository: "https://mydriatech.github.io/pitsa"

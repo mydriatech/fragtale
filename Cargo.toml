@@ -1,0 +1,78 @@
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[workspace]
+resolver = "2"
+
+members = [
+    "fragtale",
+    "fragtale-api",
+    "fragtale-core",
+    "fragtale-client",
+    "fragtale-dbp",
+    "fragtale-dbp-cassandra",
+    "fragtale-dbp-mem",
+    "fragtale-metrics",
+]
+
+[workspace.package]
+edition = "2024"
+license = "Apache-2.0 WITH AdditionRef-FWM-Exception-1.0.0"
+version = "0.0.0"
+repository = "https://github.com/mydriatech/fragtale.git"
+publish = false
+
+#[profile.dev]
+#opt-level = 1
+#lto = "thin"
+#incremental = true
+
+[profile.release]
+opt-level = 3
+# https://doc.rust-lang.org/rustc/codegen-options/index.html#strip
+#strip = "debuginfo"
+strip = "symbols"
+# Link time optimizations off->false->thin->fat
+lto = "fat"
+# No stack unwinding is required -> reduce size of code
+panic = 'abort'
+# No fast parallel processing to look for addition optimizations
+# Saves a MB or so for 20 extra seconds
+codegen-units = 1
+# For profiling
+#debug = 1
+# Keep debug!() and trace!()
+#debug-logging=true
+
+[workspace.dependencies]
+
+# Cryptographic provider
+tyst = { git = "https://github.com/mydriatech/tyst.git", branch = "main" }
+#tyst = { path = "../tyst/tyst-core", default-features = true, features = [] }
+tyst_api_rest_health = { git = "https://github.com/mydriatech/tyst.git", branch = "main" }
+#tyst_api_rest_health = { path = "../tyst/tyst-api-rest-health", default-features = true, features = [] }
+
+# PKI utility libraries
+#upkit_common = { git = "https://github.com/mydriatech/upkit-common.git", branch = "main" }
+#upkit_common = { path = "../upkit-common/upkit-common", default-features = true, features = [] }
+
+# Logging
+log = { version = "0.4", default-features = false, features = ["release_max_level_debug"] }
+env_logger = { version = "0.11.1", default-features = false, features = [] }
+
+# Async and concurrency
+async-trait = { version = "0.1", default-features = false, features = [] }
+tokio = { version = "1", default-features = false, features = ["rt-multi-thread", "macros", "signal"] }
+crossbeam-skiplist = { version = "0.1", default-features = true }
+
+# JSON
+serde = { version = "1.0", default-features = false, features = ["std"] }
+serde_json = "1.0"
+serde_with = { version = "3.11", default-features = true, features = ["base64", "hex"] }
+
+# REST API
+actix-web = { version = "4.6", default-features = false, features = ["macros", "http2", "compress-brotli"] }
+utoipa = { version = "5", features = ["actix_extras"] }
+
+# HTTP client
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls-manual-roots", "brotli", "http2"] }
+#reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "brotli"] }

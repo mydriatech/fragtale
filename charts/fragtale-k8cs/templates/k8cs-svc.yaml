@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "fragtale-k8cs.fullname" . }}-dc1-custom-svc
+spec:
+  type: ClusterIP
+  ports:
+  - name: native
+    port: 9042
+    protocol: TCP
+    targetPort: 9042
+  selector:
+    cassandra.datastax.com/cluster: {{ include "fragtale-k8cs.fullname" . }}
+    cassandra.datastax.com/datacenter: dc1

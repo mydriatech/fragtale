@@ -1,0 +1,23 @@
+# Tiny cassandra cluster for development and testing.
+
+# Cassandra version
+#
+# See also https://github.com/k8ssandra/management-api-for-apache-cassandra#supported-image-matrix
+serverVersion: "5.0.4"
+
+# Number of cluster nodes. Use at least 2 for application that rely on LWTs.
+size: 3
+
+# Resources allocated to each node.
+resources:
+  cpu: 2
+  # Kubernetes unit type
+  memory: 2Gi
+  # Persistent volume claim allocation
+  storage: 64Gi
+  #storageClassName: standard
+
+  # Java unit type
+  #
+  # Default: max(min(1/2 ram, 1024MB), min(1/4 ram, 8GB)
+  heapSize: 512M

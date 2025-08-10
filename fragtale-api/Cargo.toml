@@ -1,0 +1,46 @@
+[package]
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+publish = { workspace = true }
+name = "fragtale_api"
+description = "Fragtale API"
+
+[[bin]]
+name = "openapi"
+test = false
+bench = false
+
+[dependencies]
+fragtale_core = { path = "../fragtale-core" }
+fragtale_client = { path = "../fragtale-client" }
+fragtale_metrics = { path = "../fragtale-metrics" }
+
+tyst = { workspace = true, features = [] }
+tyst_api_rest_health = { workspace = true, features = [] }
+
+# Async and concurrency
+crossbeam-skiplist = { workspace = true, features = [] }
+futures = { version = "0.3", default-features = false, features = ["std", "async-await"] }
+tokio = { workspace = true, features = [] }
+
+# Logging and tracing
+log = { workspace = true, features = [] }
+
+# REST API
+actix-web = { workspace = true, features = [] }
+utoipa = { workspace = true, features = [] }
+
+# WebSockets for Actix
+actix-ws = { version = "0.3", default-features = false, features = [] }
+
+# JSON
+serde = { workspace = true, features = [] }
+serde_json = { workspace = true, features = [] }
+
+# JSON Web Tokens
+jsonwebtoken = { version = "9", default-features = false, features = [] }
+
+# HTTP client
+reqwest = { workspace = true, features = [] }
