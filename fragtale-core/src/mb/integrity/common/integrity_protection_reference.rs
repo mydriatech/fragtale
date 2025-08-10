@@ -114,7 +114,7 @@ impl IntegrityProtectionReference {
             .ok_or_else(|| {
                 let encoded_proof = proof.get_encoded_proof();
                 let encoded_proof_hex = if encoded_proof.len() > 9 * 64 {
-                    encoded_proof[0..(9 * 64)].as_ref().to_hex() + "..."
+                    (&encoded_proof[0..(9 * 64)]).to_hex() + "..."
                 } else {
                     encoded_proof.to_hex()
                 };
