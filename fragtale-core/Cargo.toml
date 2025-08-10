@@ -28,7 +28,7 @@ env_logger = { workspace = true, features = [] }
 
 # Config and platform info
 config = { version = "0.14", default-features = false, features = ["json"] }
-cgroups-rs = "0.3"
+cgroups-rs = "0.4"
 
 # JSON
 serde = { workspace = true, features = [] }
