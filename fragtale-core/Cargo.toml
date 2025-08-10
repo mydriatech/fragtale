@@ -39,5 +39,5 @@ serde_with = { workspace = true, features = [] }
 jsonschema = { version = "0.32", default-features = false, features = [] }
 
 # NTP client
-sntpc = { version = "0.5.2", default-features = false, features = ["std", "tokio-socket"] }
+sntpc = { version = "0.6.0", default-features = false, features = ["std", "tokio-socket"] }
 
