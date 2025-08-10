@@ -1,10 +1,6 @@
 apiVersion: v2
 name: fragtale
-description: Cassandra Event Sourcing Overlay
+description: Turn your planet scale DB into a trustworthy message queue (MQ) with event sourcing capabilities.
 type: application
 version: 0.0.0
 appVersion: "0.0.0"
-#dependencies:
-#- name: pitsa
-#  version: "0.2.0"
-#  repository: "https://mydriatech.github.io/pitsa"
