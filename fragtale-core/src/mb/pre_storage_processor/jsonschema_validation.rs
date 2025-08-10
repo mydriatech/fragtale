@@ -20,7 +20,6 @@
 use fragtale_dbp::mb::MessageBrokerError;
 use fragtale_dbp::mb::MessageBrokerErrorKind;
 use jsonschema::Draft;
-use jsonschema::JSONSchema;
 
 /// [JSON Schema](https://json-schema.org/) validation.
 pub fn validate_draft202012(schema: &str, document: &str) -> Result<(), MessageBrokerError> {
@@ -32,17 +31,15 @@ pub fn validate_draft202012(schema: &str, document: &str) -> Result<(), MessageB
         MessageBrokerErrorKind::PreStorageProcessorError
             .error_with_msg(format!("Failed to parse document as JSON: {e:?}"))
     })?;
-    let compiled = JSONSchema::options()
+    let compiled = jsonschema::options()
         .with_draft(Draft::Draft202012)
-        .compile(&schema)
+        .build(&schema)
         .map_err(|e| {
             MessageBrokerErrorKind::PreStorageProcessorError
                 .error_with_msg(format!("Failed to compile JSONSchema: {e:?}"))
         })?;
     compiled.validate(&document).map_err(|e| {
-        for error in e {
-            log::debug!("Validation error at '{}': {}", error.instance_path, error);
-        }
+        log::debug!("Validation error at '{}': {}", e.instance_path, e);
         MessageBrokerErrorKind::PreStorageProcessorError
             .error_with_msg("Failed to validate document")
     })

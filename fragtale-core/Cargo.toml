@@ -15,7 +15,6 @@ fragtale_dbp_mem = { path = "../fragtale-dbp-mem" }
 fragtale_metrics = { path = "../fragtale-metrics" }
 
 tyst = { workspace = true, features = [] }
-#upkit_common = { workspace = true, features = [] }
 
 # Async and concurrency
 async-trait = { workspace = true, features = [] }
@@ -37,11 +36,8 @@ serde_json = { workspace = true, features = [] }
 serde_with = { workspace = true, features = [] }
 
 # JSONSchema
-jsonschema = { version = "0.32", default-features = false, features = ["draft201909", "draft202012"] }
+jsonschema = { version = "0.32", default-features = false, features = [] }
 
 # NTP client
 sntpc = { version = "0.5.2", default-features = false, features = ["std", "tokio-socket"] }
-
-# Memory efficiency
-#arrayvec = "0.7"
 
