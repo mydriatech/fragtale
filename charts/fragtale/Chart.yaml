@@ -1,6 +1,0 @@
-apiVersion: v2
-name: fragtale
-description: Turn your planet scale DB into a trustworthy message queue (MQ) with event sourcing capabilities.
-type: application
-version: 0.0.0
-appVersion: "0.0.0"

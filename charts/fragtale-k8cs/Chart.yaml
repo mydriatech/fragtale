@@ -1,6 +1,0 @@
-apiVersion: v2
-name: fragtale-k8cs
-description: Fragtale Cassandra provisioning
-type: application
-version: 0.0.0
-appVersion: "0.0.0"
