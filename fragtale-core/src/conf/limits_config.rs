@@ -43,12 +43,12 @@ impl AppConfigDefaults for ResourceLimitsConfig {
         let mut cpu_quota = None;
         let mut cpu_period = None;
         let mut memory_max = None;
-        cgroups_rs::hierarchies::auto()
+        cgroups_rs::fs::hierarchies::auto()
             .subsystems()
             .iter()
             .for_each(|subsystem| match subsystem.controller_name().as_str() {
                 "cpu" => {
-                    let cpu_controller: &cgroups_rs::cpu::CpuController = subsystem.into();
+                    let cpu_controller: &cgroups_rs::fs::cpu::CpuController = subsystem.into();
                     cpu_quota = cpu_controller
                         .cfs_quota()
                         .ok()
@@ -56,9 +56,10 @@ impl AppConfigDefaults for ResourceLimitsConfig {
                     cpu_period = cpu_controller.cfs_period().ok();
                 }
                 "memory" => {
-                    let memory_controller: &cgroups_rs::memory::MemController = subsystem.into();
+                    let memory_controller: &cgroups_rs::fs::memory::MemController =
+                        subsystem.into();
                     if let Ok(mem) = memory_controller.get_mem()
-                        && let Some(cgroups_rs::MaxValue::Value(mem_max_value)) = mem.max
+                        && let Some(cgroups_rs::fs::MaxValue::Value(mem_max_value)) = mem.max
                     {
                         memory_max = u64::try_from(std::cmp::max(mem_max_value, 0)).ok();
                     }
