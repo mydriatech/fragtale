@@ -34,4 +34,4 @@ reqwest = { workspace = true, features = [] }
 #reqwest-websocket = { version = "0.4", default-features = false, features = ["json"] }
 
 # WebSocket API client
-tokio-tungstenite = { version = "0.24", default-features = false, features = ["default", "rustls"] }
+tokio-tungstenite = { version = "0.27", default-features = false, features = ["default", "rustls"] }

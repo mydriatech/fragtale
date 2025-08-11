@@ -160,7 +160,7 @@ impl WebSocketConnection {
                     .ws_write_stream
                     .lock()
                     .await
-                    .send(Message::Ping(ping_id.as_slice().to_vec()))
+                    .send(Message::Ping(ping_id.as_slice().to_vec().into()))
                     .await
                 {
                     log::debug!("Sending ping failed: {e:?}");
@@ -233,7 +233,7 @@ impl WebSocketConnection {
 
     /// Send all commands to the WebSocket and flush afterwards
     pub async fn send(&self, command: &SubscriberCommand, flush: bool) {
-        let msg = Message::Text(serde_json::to_string(&command).unwrap());
+        let msg = Message::Text(serde_json::to_string(&command).unwrap().into());
         let mut web_socket = self.ws_write_stream.lock().await;
         let res = if flush {
             web_socket.send(msg).await
