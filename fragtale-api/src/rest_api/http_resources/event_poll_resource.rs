@@ -112,10 +112,13 @@ pub async fn next_event_by_topic_and_consumer(
                 [topic_id, unique_time.to_string(), instance_id.to_string()],
             )
             .unwrap();
+        // TODO: Work-around apparent bug where the 2nd and 3rd path args are dropped.
+        let confirmation_url = format!("{confirmation_url}/{unique_time}/{instance_id}");
+        log::debug!("TMPDEBUG: confirmation_url: {confirmation_url:?}");
         Ok(HttpResponse::build(StatusCode::OK)
             .append_header((
                 "Link",
-                format!(r#"<{}>;rel="confirm-delivery""#, confirmation_url.as_str()),
+                format!(r#"<{confirmation_url}>;rel="confirm-delivery""#),
             ))
             .append_header(("correlation-token", correlation_token))
             .body(event_document))

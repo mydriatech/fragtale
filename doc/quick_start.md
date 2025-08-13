@@ -36,7 +36,7 @@ helm repo add mt-fragtale https://mydriatech.github.io/fragtale
 helm repo update
 helm upgrade --install --atomic --create-namespace --namespace fragtale-demo --timeout 15m0s \
     --set size=2 \
-    fragtale-k8cs charts/fragtale-k8cs
+    fragtale-k8cs mt-fragtale/fragtale-k8cs
 watch kubectl get -n fragtale-demo k8cs/fragtale-k8cs -o=jsonpath='{.status.datacenters.dc1.cassandra.cassandraOperatorProgress}'
 # ...and be patient. This can take 5+ minutes to reach the "Ready" status depending on your hardware.
 ```
@@ -105,16 +105,23 @@ kubectl exec -it -n fragtale-demo-app fragtale-client -- sh
 # Poll for events on topic "demo"
 curl --header "Authorization: Bearer $(cat /var/run/secrets/tokens/service-account)" \
     http://fragtale.fragtale-demo.svc.cluster.local:8081/api/v1/topics/demo/next?from_epoch_ms=0 -o - -D -
-#...this takes a since topic is created on the fly...
+#...this takes some time since topic is created on the fly...
 
-# Publish event to topic "demo"
+# Publish event to topic "demo" (and as a side effect take ownership of this topic)
 curl --header "Authorization: Bearer $(cat /var/run/secrets/tokens/service-account)" \
     http://fragtale.fragtale-demo.svc.cluster.local:8081/api/v1/topics/demo/events -X PUT -D - --data '{"test":"this is an example event"}'
 
 # Poll for events on topic "demo"
-sleep 1
+sleep 3
 curl --header "Authorization: Bearer $(cat /var/run/secrets/tokens/service-account)" \
     http://fragtale.fragtale-demo.svc.cluster.local:8081/api/v1/topics/demo/next -o - -D -
+
+# Make a note of the "link" response header above.
+# Unless you confirm the delivery, the same event will be re-delivered as "next" after a while
+# Use the link below
+curl --header "Authorization: Bearer $(cat /var/run/secrets/tokens/service-account)" \
+    http://fragtale.fragtale-demo.svc.cluster.local:8081/api/v1/topics/demo/confirm/1726000514355621/1 -X PUT -D -
+
 logout
 
 kubectl delete -f /tmp/fragtale-demo-app.yaml
