@@ -47,13 +47,7 @@ codegen-units = 1
 
 # Cryptographic provider
 tyst = { git = "https://github.com/mydriatech/tyst.git", branch = "main" }
-#tyst = { path = "../tyst/tyst-core", default-features = true, features = [] }
 tyst_api_rest_health = { git = "https://github.com/mydriatech/tyst.git", branch = "main" }
-#tyst_api_rest_health = { path = "../tyst/tyst-api-rest-health", default-features = true, features = [] }
-
-# PKI utility libraries
-#upkit_common = { git = "https://github.com/mydriatech/upkit-common.git", branch = "main" }
-#upkit_common = { path = "../upkit-common/upkit-common", default-features = true, features = [] }
 
 # Logging
 log = { version = "0.4", default-features = false, features = ["release_max_level_debug"] }
@@ -70,9 +64,8 @@ serde_json = "1.0"
 serde_with = { version = "3.11", default-features = true, features = ["base64", "hex"] }
 
 # REST API
-actix-web = { version = "4.6", default-features = false, features = ["macros", "http2", "compress-brotli"] }
+actix-web = { version = "4.11", default-features = false, features = ["macros", "http2", "compress-brotli"] }
 utoipa = { version = "5", features = ["actix_extras"] }
 
 # HTTP client
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls-manual-roots", "brotli", "http2"] }
-#reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "brotli"] }
