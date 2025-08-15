@@ -65,26 +65,15 @@ impl ConsumerDeliveryCache {
             delivery_intent_template
         })
     }
-
-    /// Purge old and no longer relevant entries in the set of events recently
-    /// pulled for delivery.
-    pub fn purge_recent_older_than(&self, timestamp_micros: u64) {
-        while let Some(entry) = self.recently_pulled.front() {
-            let unique_time = entry.value();
-            if unique_time.get_time_micros() < timestamp_micros {
-                self.recently_pulled.remove(unique_time);
-            } else {
-                break;
-            }
-        }
-    }
 }
 
 impl DeliveryIntentTemplateInsertable for ConsumerDeliveryCache {
     fn insert(&self, delivery_intent_template: DeliveryIntentTemplate) {
-        if !self
+        // Remove entry if it already existed to delay re-insert
+        if self
             .recently_pulled
-            .contains(&delivery_intent_template.get_unique_time())
+            .remove(&delivery_intent_template.get_unique_time())
+            .is_none()
         {
             self.events.insert(
                 delivery_intent_template.get_unique_time(),

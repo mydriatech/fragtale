@@ -18,7 +18,6 @@
 //! Meta-data about an event used during delivery.
 
 use crate::mb::UniqueTime;
-//use crate::mb::event_descriptor::DescriptorVersion;
 
 /// Meta-data about an event used during delivery.
 #[derive(Clone)]

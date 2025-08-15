@@ -29,6 +29,7 @@ use fragtale_dbp::mb::UniqueTime;
 use fragtale_dbp::mb::consumers::DeliveryIntentTemplateInsertable;
 use fragtale_dbp::mb::consumers::EventDeliveryGist;
 use std::sync::Arc;
+use std::sync::atomic::AtomicBool;
 use std::sync::atomic::AtomicU64;
 use std::sync::atomic::Ordering;
 use tokio::time::Duration;
@@ -44,6 +45,8 @@ pub struct TopicConsumer {
     object_count_tracker: Arc<ObjectCountTracker>,
     consumer_delivery_cache: Arc<ConsumerDeliveryCache>,
     last_reservation_attempt_micros: AtomicU64,
+    maintain_fresh_has_run: AtomicBool,
+    maintain_other_has_run: AtomicBool,
 }
 impl TopicConsumer {
     /// Return a new instance.
@@ -62,6 +65,8 @@ impl TopicConsumer {
             object_count_tracker: Arc::clone(object_count_tracker),
             consumer_delivery_cache: ConsumerDeliveryCache::new(),
             last_reservation_attempt_micros: AtomicU64::new(0),
+            maintain_fresh_has_run: AtomicBool::new(false),
+            maintain_other_has_run: AtomicBool::new(false),
         })
         .init()
     }
@@ -82,7 +87,7 @@ impl TopicConsumer {
     ///
     /// If it takes longer to retrieve new events from the database than this
     /// duration, some newly publihsed events will be handled as "old".
-    const FRESHNESS_DURATION_MICROS: u64 = 1_500_000;
+    const FRESHNESS_DURATION_MICROS: u64 = 1_500_000 * 2;
     const CLOCK_SKEW_TOLERANCE_MICROS: u64 = 100_000;
 
     /// Reserve a new event to deliver of an acceptable version.
@@ -90,6 +95,13 @@ impl TopicConsumer {
         &self,
         descriptor_version: Option<DescriptorVersion>,
     ) -> Option<EventDeliveryGist> {
+        while !self.maintain_fresh_has_run.load(Ordering::Relaxed)
+            || !self.maintain_other_has_run.load(Ordering::Relaxed)
+        {
+            // Sleep until this happens for the first time
+            sleep(Duration::from_millis(128)).await;
+            log::debug!("Waiting for fresh and old cache population to run.");
+        }
         self.last_reservation_attempt_micros.store(
             fragtale_client::time::get_timestamp_micros(),
             Ordering::Relaxed,
@@ -207,6 +219,13 @@ impl TopicConsumer {
                         log::trace!("Updated done baseline!");
                     }
                 }
+                self.maintain_fresh_has_run.store(true, Ordering::Relaxed);
+                if log::log_enabled!(log::Level::Trace) {
+                    log::trace!(
+                        "After getting fresh, the cache now has {} items.",
+                        self.consumer_delivery_cache.len()
+                    );
+                }
                 let duration = fragtale_client::time::get_timestamp_micros() - now;
                 if duration > Self::FRESHNESS_DURATION_MICROS {
                     log::warn!(
@@ -252,7 +271,7 @@ impl TopicConsumer {
                     tokio::task::yield_now().await;
                 }
             } else {
-                log::warn!("Consumer {} has disappeared.", self.consumer_id);
+                log::info!("Consumer {} has disappeared.", self.consumer_id);
                 sleep(Duration::from_millis(5000)).await;
             }
         }
@@ -269,13 +288,6 @@ impl TopicConsumer {
         let mut counter = 0u64;
         loop {
             let now = fragtale_client::time::get_timestamp_micros();
-            // Prevent protection from insert while reserving does not grow unbound
-            let self_clone = Arc::clone(self);
-            tokio::task::spawn_blocking(move || {
-                self_clone
-                    .consumer_delivery_cache
-                    .purge_recent_older_than(now - Self::FRESHNESS_DURATION_MICROS);
-            });
             // Refresh ConsumerEntity info
             if let Some(unique_time_done) = self
                 .dbp
@@ -312,8 +324,18 @@ impl TopicConsumer {
                         )
                         .await;
                     if applied && log::log_enabled!(log::Level::Trace) {
-                        log::trace!("Updated done baseline!");
+                        log::trace!(
+                            "'{}' has processed all events up to {last_done_ts} epoch microseconds.",
+                            self.consumer_id
+                        );
                     }
+                }
+                self.maintain_other_has_run.store(true, Ordering::Relaxed);
+                if log::log_enabled!(log::Level::Trace) {
+                    log::trace!(
+                        "After getting others, the cache now has {} items.",
+                        self.consumer_delivery_cache.len()
+                    );
                 }
                 if log::log_enabled!(log::Level::Debug) {
                     let duration = fragtale_client::time::get_timestamp_micros() - start_ts;
