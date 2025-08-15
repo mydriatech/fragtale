@@ -350,10 +350,16 @@ impl ConsumerDeliveryFacade for CassandraConsumerDeliveryFacade {
         {
             return false;
         };
-        if let Some(_failed_intent_ts) = failed_intent_ts_micros {
+        let mut retried_old_intent = false;
+        if failed_intent_ts_micros.is_some() {
             // Retry
             for die in dies {
                 if die.get_delivering_instance_id() == instance_id_local {
+                    if log::log_enabled!(log::Level::Trace) {
+                        log::trace!(
+                            "Withdrawing node {instance_id_local}'s retraction for event unique time {event_unique_time:?} on topic '{topic_id}'."
+                        );
+                    }
                     // Update intent_ts and withdraw retraction
                     DeliveryIntentEntity::update_retracted_and_intent_ts(
                         &self.cassandra_provider,
@@ -361,14 +367,16 @@ impl ConsumerDeliveryFacade for CassandraConsumerDeliveryFacade {
                         consumer_id,
                         event_unique_time,
                         instance_id_local,
-                        true,
+                        false,
                         intent_ts_micros,
                     )
                     .await;
+                    retried_old_intent = true;
                     break;
                 }
             }
-        } else {
+        }
+        if failed_intent_ts_micros.is_none() || !retried_old_intent {
             // Persist a non-retracted delivery intent
             DeliveryIntentEntity::new(
                 consumer_id,
@@ -393,7 +401,7 @@ impl ConsumerDeliveryFacade for CassandraConsumerDeliveryFacade {
         // Ignore non-retracted from timed out delivery intents
         .filter(|die| die.get_intent_ts() > timeout_ts)
         .collect::<Vec<_>>();
-        // Assumption: If two entires are wirtten at the same time, both writers will see each others writes.
+        // Assumption: If two entires are written at the same time, both writers will see each others writes.
         // Order by WRITETIME (retracted), intent_ts, instance_id
         dies.sort_unstable_by_key(DeliveryIntentEntity::get_delivering_instance_id);
         dies.sort_by_key(DeliveryIntentEntity::get_intent_ts);
@@ -544,30 +552,28 @@ impl ConsumerDeliveryFacade for CassandraConsumerDeliveryFacade {
                     )
                 {
                     tokio::task::yield_now().await;
+                    let unique_time_high_inclusive = UniqueTime::min_encoded_for_micros(timeout_ts);
                     let delivery_intent_vec = DeliveryIntentEntity::select_by_unique_time(
                         &self.cassandra_provider,
                         topic_id,
                         consumer_id,
                         bucket.unwrap(),
                         unique_time_low_exclusive,
-                        timeout_ts,
+                        unique_time_high_inclusive,
                         1000,
                     )
                     .await;
                     if log::log_enabled!(log::Level::Trace) {
                         log::trace!(
-                            "shelf {shelf} bucket {} with {unique_time_low_exclusive} has {} results",
+                            "topic_id '{topic_id}': shelf {shelf} bucket {} with ({unique_time_low_exclusive}..{unique_time_high_inclusive}] has {} results",
                             bucket.unwrap(),
                             delivery_intent_vec.len(),
                         );
                     }
                     // if there are no more results in this bucket
                     if delivery_intent_vec.is_empty() {
-                        if all_done {
-                            last_done_ts = UniqueTime::from(UniqueTime::max_encoded_in_bucket(
-                                bucket.unwrap(),
-                            ));
-                        }
+                        // Don't update the done baseline, since there might
+                        // exist events that have not even been tried yet.
                         break;
                     }
                     total_count += delivery_intent_vec.len();
@@ -583,7 +589,6 @@ impl ConsumerDeliveryFacade for CassandraConsumerDeliveryFacade {
                         }
                         all_done = false;
                         if delivery_intent.get_intent_ts() >= timeout_ts {
-                            done_count += 1;
                             continue;
                         }
                         consumer_delivery_cache.insert(DeliveryIntentTemplate::new(
@@ -594,7 +599,7 @@ impl ConsumerDeliveryFacade for CassandraConsumerDeliveryFacade {
                         ));
                         if consumer_delivery_cache.is_full() {
                             if done_count > 0 || total_count > 0 {
-                                log::info!("done_count: {done_count}, total_count: {total_count}");
+                                log::debug!("done_count: {done_count}, total_count: {total_count}");
                             }
                             return std::cmp::min(
                                 last_done_ts.as_encoded(),
@@ -618,8 +623,8 @@ impl ConsumerDeliveryFacade for CassandraConsumerDeliveryFacade {
                 .map(UniqueTimeBucketByShelfEntity::get_bucket);
             }
         }
-        if done_count > 0 || total_count > 0 {
-            log::info!("done_count: {done_count}, total_count: {total_count}");
+        if log::log_enabled!(log::Level::Debug) && (done_count > 0 || total_count > 0) {
+            log::debug!("done_count: {done_count}, total_count: {total_count}");
         }
         std::cmp::min(
             last_done_ts.as_encoded(),
