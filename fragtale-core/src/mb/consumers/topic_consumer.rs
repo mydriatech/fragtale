@@ -87,7 +87,7 @@ impl TopicConsumer {
     ///
     /// If it takes longer to retrieve new events from the database than this
     /// duration, some newly publihsed events will be handled as "old".
-    const FRESHNESS_DURATION_MICROS: u64 = 1_500_000 * 2;
+    const FRESHNESS_DURATION_MICROS: u64 = 3_000_000;
     const CLOCK_SKEW_TOLERANCE_MICROS: u64 = 100_000;
 
     /// Reserve a new event to deliver of an acceptable version.

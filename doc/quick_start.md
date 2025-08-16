@@ -108,24 +108,23 @@ curl --header "Authorization: Bearer $(cat /var/run/secrets/tokens/service-accou
 #...this takes some time since topic is created on the fly...
 
 # Publish event to topic "demo" (and as a side effect take ownership of this topic)
-curl --header "Authorization: Bearer $(cat /var/run/secrets/tokens/service-account)" \
-    http://fragtale.fragtale-demo.svc.cluster.local:8081/api/v1/topics/demo/events -X PUT -D - --data '{"test":"this is an example event"}'
+curl --header "Authorization: Bearer $(cat /var/run/secrets/tokens/service-account)" -X PUT \
+    http://fragtale.fragtale-demo.svc.cluster.local:8081/api/v1/topics/demo/events -D - --data '{"test":"this is an example event"}'
 
 # Poll for events on topic "demo"
-sleep 3
 curl --header "Authorization: Bearer $(cat /var/run/secrets/tokens/service-account)" \
     http://fragtale.fragtale-demo.svc.cluster.local:8081/api/v1/topics/demo/next -o - -D -
 
 # Make a note of the "link" response header above.
 # Unless you confirm the delivery, the same event will be re-delivered as "next" after a while
 # Use the link below
-curl --header "Authorization: Bearer $(cat /var/run/secrets/tokens/service-account)" \
-    http://fragtale.fragtale-demo.svc.cluster.local:8081/api/v1/topics/demo/confirm/1726000514355621/1 -X PUT -D -
+curl --header "Authorization: Bearer $(cat /var/run/secrets/tokens/service-account)" -X PUT \
+    REPLACE_WITH_LINK -D -
 
 logout
 
 kubectl delete -f /tmp/fragtale-demo-app.yaml
-
+kubectl delete namespace fragtale-demo-app
 ```
 
 

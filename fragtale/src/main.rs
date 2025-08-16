@@ -76,30 +76,17 @@ fn init_logger() -> Result<(), log::SetLoggerError> {
     env_logger::builder()
         // Set default log level
         .filter_level(log::LevelFilter::Debug)
-        //.filter_level(log::LevelFilter::Trace)
         // Customize logging for dependencies
         .filter(Some("actix_server::builder"), log::LevelFilter::Warn)
-        .filter(Some("actix_http::h1"), log::LevelFilter::Debug)
-        .filter(Some("mio::poll"), log::LevelFilter::Debug)
-        //.filter(Some("ureq"), log::LevelFilter::Info)
         .filter(Some("rustls::client"), log::LevelFilter::Info)
-        .filter(
-            Some("fragtale_dbp_cassandra::cassandra_provider"),
-            log::LevelFilter::Debug,
-        )
         .filter(Some("fragtale::mb::correlation"), log::LevelFilter::Info)
         .filter(
             Some("fragtale::mb::event_descriptor_cache"),
             log::LevelFilter::Info,
         )
-        .filter(Some("fragtale::mb"), log::LevelFilter::Debug)
         .filter(
             Some("fragtale::rest_api::ws_resources"),
             log::LevelFilter::Info,
-        )
-        .filter(
-            Some("fragtale::mb::consumers::consumer_delivery_cache"),
-            log::LevelFilter::Debug,
         )
         //.write_style(env_logger::fmt::WriteStyle::Never)
         .write_style(env_logger::fmt::WriteStyle::Auto)
