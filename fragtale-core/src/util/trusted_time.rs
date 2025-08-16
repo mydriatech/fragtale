@@ -25,6 +25,7 @@ use std::net::SocketAddr;
 use std::net::ToSocketAddrs;
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
 use tokio::net::UdpSocket;
 
 /// Monitors local time compared with NTP time source.
@@ -103,6 +104,9 @@ impl TrustedTime {
             loop {
                 let client_socket = Arc::clone(&client_socket);
                 // Spawn background job and sleep always in main "thread"
+                let within_tolerance = self_clone
+                    .local_time_within_tolerance
+                    .load(Ordering::Relaxed);
                 let res = tokio::spawn(async move {
                     let context = NtpContext::new(StdTimestampGen::default());
                     let deadline = tokio::time::Instant::now()
@@ -117,7 +121,13 @@ impl TrustedTime {
                             log::warn!("No NTP response within {interval_micros} µs.");
                         }
                         Ok(Err(e)) => {
-                            log::warn!("Failed NTP request: {e:?}");
+                            if within_tolerance {
+                                log::warn!(
+                                    "Failed NTP request. This will be retried. Error: {e:?}"
+                                );
+                            } else {
+                                log::debug!("NTP request failure: {e:?}");
+                            }
                         }
                         Ok(Ok(ntp_result)) => {
                             return Some(ntp_result);
@@ -139,7 +149,7 @@ impl TrustedTime {
                 }
                 self_clone
                     .local_time_within_tolerance
-                    .store(within_tolerance, std::sync::atomic::Ordering::Relaxed);
+                    .store(within_tolerance, Ordering::Relaxed);
             }
         });
         self

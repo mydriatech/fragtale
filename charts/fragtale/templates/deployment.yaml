@@ -82,6 +82,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
+          - name: LOG_LEVEL
+            {{- if .Values.app.debug }}
+            value: "DEBUG"
+            {{- else }}
+            value: "INFO"
+            {{- end }}
             {{- if .Values.app.backend.cassandra }}
           - name: FRAGTALE_API_PORT
             value: "{{ .Values.service.port }}"
@@ -93,7 +99,6 @@ spec:
             value: "{{ .Values.app.backend.cassandra.keyspace }}"
           - name: FRAGTALE_BACKEND_ENDPOINTS
             value: "{{ join "," .Values.app.backend.cassandra.hosts }}"
-            #value: "fragtale-k8cs-dc1-custom-svc:9042"
           - name: FRAGTALE_BACKEND_USERNAME
             valueFrom:
               secretKeyRef:
