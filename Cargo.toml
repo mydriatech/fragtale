@@ -46,8 +46,8 @@ codegen-units = 1
 [workspace.dependencies]
 
 # Cryptographic provider
-tyst = { git = "https://github.com/mydriatech/tyst.git", branch = "main" }
-tyst_api_rest_health = { git = "https://github.com/mydriatech/tyst.git", branch = "main" }
+tyst = { git = "https://github.com/mydriatech/tyst.git", tag = "0.6.17" }
+tyst_api_rest_health = { git = "https://github.com/mydriatech/tyst.git", tag = "0.6.17" }
 
 # Logging
 log = { version = "0.4", default-features = false, features = ["release_max_level_debug"] }
