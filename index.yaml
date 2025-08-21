@@ -2,6 +2,17 @@ apiVersion: v1
 entries:
   fragtale:
   - apiVersion: v2
+    appVersion: 0.1.10
+    created: "2025-08-21T20:00:48.098394396Z"
+    description: Turn your planet scale DB into a trustworthy message queue (MQ) with
+      event sourcing capabilities.
+    digest: a992c4a24496def4aa0649ed4f73491b4c5838f525af893fd82b4f30d01588ad
+    name: fragtale
+    type: application
+    urls:
+    - https://github.com/mydriatech/fragtale/releases/download/fragtale-0.1.10/fragtale-0.1.10.tgz
+    version: 0.1.10
+  - apiVersion: v2
     appVersion: 0.1.9
     created: "2025-08-21T14:14:08.938398696Z"
     description: Turn your planet scale DB into a trustworthy message queue (MQ) with
@@ -102,6 +113,16 @@ entries:
     version: 0.1.1
   fragtale-k8cs:
   - apiVersion: v2
+    appVersion: 0.1.10
+    created: "2025-08-21T20:00:48.296067731Z"
+    description: Fragtale Cassandra provisioning
+    digest: 5e43cf4dcf10fdf096861d63ecbf5df32cf045026b31915f5519ba48127b70ca
+    name: fragtale-k8cs
+    type: application
+    urls:
+    - https://github.com/mydriatech/fragtale/releases/download/fragtale-k8cs-0.1.10/fragtale-k8cs-0.1.10.tgz
+    version: 0.1.10
+  - apiVersion: v2
     appVersion: 0.1.9
     created: "2025-08-21T14:14:09.214903939Z"
     description: Fragtale Cassandra provisioning
@@ -191,4 +212,4 @@ entries:
     urls:
     - https://github.com/mydriatech/fragtale/releases/download/fragtale-k8cs-0.1.1/fragtale-k8cs-0.1.1.tgz
     version: 0.1.1
-generated: "2025-08-21T14:14:09.215039243Z"
+generated: "2025-08-21T20:00:48.296130659Z"
