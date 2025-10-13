@@ -195,7 +195,7 @@ impl MessageBroker {
                 break;
             }
             attempts += 1;
-            if attempts % 120 == 0 {
+            if attempts.is_multiple_of(120) {
                 log::info!("Local system time accurracy is still not within allowed tolerance.");
             }
             tokio::time::sleep(tokio::time::Duration::from_micros(500_000)).await;

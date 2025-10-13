@@ -40,7 +40,7 @@ serde = { workspace = true, features = [] }
 serde_json = { workspace = true, features = [] }
 
 # JSON Web Tokens
-jsonwebtoken = { version = "9", default-features = false, features = [] }
+jsonwebtoken = { version = "10", default-features = false, features = ["rust_crypto"] }
 
 # HTTP client
 reqwest = { workspace = true, features = [] }

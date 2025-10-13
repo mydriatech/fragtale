@@ -173,7 +173,7 @@ impl WebSocketPool {
                     );
                 }
             }
-            if count % 8 == 0 && log::log_enabled!(log::Level::Debug) {
+            if count.is_multiple_of(8) && log::log_enabled!(log::Level::Debug) {
                 log::debug!("No available web socket connection yet. Will retry shortly.");
             }
             tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;

@@ -102,7 +102,7 @@ impl GossipTracker {
                 return (uuid, node_count);
             }
             wait_counter += 1;
-            if wait_counter % (8 * 20) == 0 {
+            if wait_counter.is_multiple_of(20 * 1000 / 125) {
                 log::info!("Still waiting for schema gossip to settle...");
             }
             sleep(Duration::from_millis(125)).await;
