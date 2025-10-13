@@ -381,7 +381,7 @@ impl TopicConsumer {
                 log::warn!("Consumer {} has disappeared.", self.consumer_id);
                 sleep(Duration::from_millis(5000)).await;
             }
-            if log::log_enabled!(log::Level::Trace) && counter % 32 == 0 {
+            if log::log_enabled!(log::Level::Trace) && counter.is_multiple_of(32) {
                 log::trace!(
                     "consumer_delivery_cache.len: {} (recent: {})",
                     self.consumer_delivery_cache.len(),

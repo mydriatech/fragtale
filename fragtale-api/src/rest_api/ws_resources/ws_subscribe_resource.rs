@@ -191,7 +191,7 @@ async fn ship_events_to_stream(
                 }
                 // Only ping when there is no other traffic
                 let delay_micros: u64 = 64_000;
-                if counter % (EventClient::PING_INTERVAL_MICROS / delay_micros) == 0 {
+                if counter.is_multiple_of(EventClient::PING_INTERVAL_MICROS / delay_micros) {
                     if log::log_enabled!(log::Level::Trace) {
                         log::trace!("Sending ping");
                     }
