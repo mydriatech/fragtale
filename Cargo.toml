@@ -55,8 +55,9 @@ env_logger = { version = "0.11.1", default-features = false, features = [] }
 
 # Async and concurrency
 async-trait = { version = "0.1", default-features = false, features = [] }
-tokio = { version = "1", default-features = false, features = ["rt-multi-thread", "macros", "signal"] }
 crossbeam-skiplist = { version = "0.1", default-features = true }
+futures = { version = "0.3", default-features = false, features = ["std", "async-await"] }
+tokio = { version = "1", default-features = false, features = ["rt-multi-thread", "macros", "signal"] }
 
 # JSON
 serde = { version = "1.0", default-features = false, features = ["std"] }
