@@ -145,6 +145,7 @@ jobs:
     permissions:
       contents: write
       packages: write
+      releases: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
