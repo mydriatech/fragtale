@@ -22,7 +22,7 @@ tyst_api_rest_health = { workspace = true, features = [] }
 
 # Async and concurrency
 crossbeam-skiplist = { workspace = true, features = [] }
-futures = { version = "0.3", default-features = false, features = ["std", "async-await"] }
+futures = { workspace = true, features = [] }
 tokio = { workspace = true, features = [] }
 
 # Logging and tracing
