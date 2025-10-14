@@ -1,4 +1,4 @@
-FROM docker.io/library/rust:alpine as builder
+FROM docker.io/library/rust:alpine AS builder
 WORKDIR /work
 COPY . .
 RUN \
@@ -13,7 +13,7 @@ RUN \
     ./bin/extract-third-party-licenses.sh && \
     XZ_OPT='-9' tar cJf licenses.tar.xz licenses/
 
-FROM ghcr.io/mydriatech/the-ground-up:1.0.0 as tgu
+FROM ghcr.io/mydriatech/the-ground-up:1.0.0 AS tgu
 
 FROM scratch
 
