@@ -69,4 +69,4 @@ actix-web = { version = "4.11", default-features = false, features = ["macros", 
 utoipa = { version = "5", features = ["actix_extras"] }
 
 # HTTP client
-reqwest = { version = "0.12", default-features = false, features = ["rustls-tls-manual-roots", "brotli", "http2"] }
+reqwest = { version = "0.13", default-features = false, features = ["rustls-tls-manual-roots", "brotli", "http2"] }
