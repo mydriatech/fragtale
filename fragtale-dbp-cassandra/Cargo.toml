@@ -14,7 +14,7 @@ fragtale_dbp = { path = "../fragtale-dbp" }
 
 # https://github.com/krojew/cdrs-tokio
 # https://docs.rs/cdrs-tokio/latest/cdrs_tokio/
-cdrs-tokio = { version = "8.1", default-features = false, features = ["derive", "rust-tls"] }
+cdrs-tokio = { version = "9.0", default-features = false, features = ["derive", "rust-tls"] }
 uuid = { version = "1.10", default-features = false }
 
 # Async and concurrency
